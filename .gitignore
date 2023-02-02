@@ -1,0 +1,11 @@
+__pycache__
+pythonenv*
+venv
+.venv
+.coverage
+.idea
+.storage
+.DS_Store
+/tests
+setup.cfg
+test.py
