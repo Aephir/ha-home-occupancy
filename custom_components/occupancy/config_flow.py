@@ -12,7 +12,8 @@ from .const import (
     DOMAIN,
     PRESENCE_SENSOR,
     CONF_NAME,
-    CONF_HOME_OCCUPANCY
+    CONF_HOME_OCCUPANCY,
+    CONF_ADD_ANOTHER
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ DATA_SCHEMA = vol.Schema(
     {
         vol.Required(PRESENCE_SENSOR): str,  # cv.entity_id,
         vol.Required(CONF_NAME): str,  #cv.string,
+        vol.Optional(CONF_ADD_ANOTHER): bool,
     }
 )
 

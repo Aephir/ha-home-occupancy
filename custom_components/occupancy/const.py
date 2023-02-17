@@ -4,6 +4,7 @@ OCCUPANCY_SENSOR = "occupancy_sensor"
 CONF_NAME = "name"
 CONF_HOME_OCCUPANCY = "Home Occupancy"
 STATE_AWAY = "away"
+CONF_ADD_ANOTHER = "add_another"
 
 ATTR_FRIENDLY_NAME = "friendly_name"
 ATTR_GUESTS = "guests"
