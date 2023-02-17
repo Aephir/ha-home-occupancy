@@ -22,9 +22,9 @@ _LOGGER = logging.getLogger(__name__)
 # but not so much with vol.Required(PRESENCE_SENSOR): cv.entity_id
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(PRESENCE_SENSOR): cv.entity_id,
-        vol.Required(CONF_NAME): cv.string,
-        vol.Optional(CONF_ADD_ANOTHER): cv.boolean,
+        vol.Required(PRESENCE_SENSOR): str,  # cv.entity_id,
+        vol.Required(CONF_NAME): str,  # cv.string,
+        vol.Optional(CONF_ADD_ANOTHER): str,  # cv.boolean,
     }
 )
 
@@ -33,6 +33,8 @@ async def async_validate_input_entity_id(hass: HomeAssistant, data: dict) -> dic
     """Validate the user input is valid entity_id.
     Either person.*, device_tracker.* or binary_sensor.*
     """
+
+    _LOGGER.error("async_validate_input_entity_id")
 
     valid_domains = [
         "person",
@@ -50,6 +52,8 @@ async def async_validate_input_entity_id(hass: HomeAssistant, data: dict) -> dic
 
 async def async_validate_input_string(hass: HomeAssistant, data: dict) -> dict[str, Any]:
     """Validate the user input is a string."""
+
+    _LOGGER.error("async_validate_input_string")
 
     if data[CONF_NAME] is None:
         raise NoInputName
