@@ -19,36 +19,44 @@ _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(PRESENCE_SENSOR): cv.entity_id,
-        vol.Required(CONF_NAME): cv.string,
+        vol.Required(PRESENCE_SENSOR): str,  # cv.entity_id,
+        vol.Required(CONF_NAME): str,  #cv.string,
     }
 )
 
 
-async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
-    """Validate the user input allows us to connect.
-    Data has the keys from DATA_SCHEMA with values provided by the user.
+async def async_validate_input_entity_id(hass: HomeAssistant, data: dict) -> dict[str, Any]:
+    """Validate the user input is valid entity_id.
+    Either person.*, device_tracker.* or binary_sensor.*
     """
-    # Validate the data can be used to set up a connection.
 
-    # This is a simple example to show an error in the UI for a short hostname
-    # The exceptions are defined at the end of this file, and are used in the
-    # `async_step_user` method below.
     valid_domains = [
         "person",
         "device_tracker",
         "binary_sensor"
     ]
 
-    entity_split = data[PRESENCE_SENSOR].split(".")
+    entity = cv.entity_id(data[PRESENCE_SENSOR])
+    entity_split = entity.split(".")
     if entity_split[0] not in valid_domains:
         raise InvalidEntityID
 
-    return {"title": data[PRESENCE_SENSOR]}
+    return {"title": entity}
+
+
+async def async_validate_input_string(hass: HomeAssistant, data: dict) -> dict[str, Any]:
+    """Validate the user input is a string."""
+
+    if data[CONF_NAME] is None:
+        raise NoInputName
+    else:
+        entity = cv.string(data[CONF_NAME])
+
+    return {"title": entity}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Hello World."""
+    """Handle a config flow for the Home Occupancy."""
 
     VERSION = 1
     # Pick one of the available connection classes in homeassistant/config_entries.py
@@ -66,7 +74,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             try:
-                info = await validate_input(self.hass, user_input)
+                info_entity = await async_validate_input_entity_id(self.hass, user_input)
+                info_name = await async_validate_input_string(self.hass, user_input)
             except InvalidEntityID:
                 errors["base"] = "invalid_entity_id"
             except Exception:  # pylint: disable=broad-except
@@ -95,3 +104,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class InvalidEntityID(exceptions.InvalidEntityFormatError):
     """Error to indicate invalid entity_id."""
 
+
+class NoInputName(exceptions.IntegrationError):
+    """Error to indicate no input name."""
