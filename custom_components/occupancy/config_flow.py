@@ -18,11 +18,13 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# The schema sort of works with vol.Required(PRESENCE_SENSOR): str
+# but not so much with vol.Required(PRESENCE_SENSOR): cv.entity_id
 DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(PRESENCE_SENSOR): str,  # cv.entity_id,
-        vol.Required(CONF_NAME): str,  #cv.string,
-        vol.Optional(CONF_ADD_ANOTHER): bool,
+        vol.Required(PRESENCE_SENSOR): cv.entity_id,
+        vol.Required(CONF_NAME): cv.string,
+        vol.Optional(CONF_ADD_ANOTHER): cv.boolean,
     }
 )
 
