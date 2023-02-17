@@ -39,10 +39,10 @@ async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
         "device_tracker",
         "binary_sensor"
     ]
-    try:
-        entity_split = data[PRESENCE_SENSOR].split(".")
-        if entity_split[0] not in valid_domains:
-            raise InvalidEntityID
+
+    entity_split = data[PRESENCE_SENSOR].split(".")
+    if entity_split[0] not in valid_domains:
+        raise InvalidEntityID
 
     return {"title": data[PRESENCE_SENSOR]}
 
@@ -55,7 +55,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     # automatically. This example uses PUSH, as the dummy hub will notify HA of
     # changes.
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
-
 
 
     def __init__(self):

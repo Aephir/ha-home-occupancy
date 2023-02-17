@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, List
+from typing import Any
 from collections.abc import Callable
 from homeassistant.helpers.entity import Entity
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -13,9 +13,7 @@ from homeassistant.const import (
     STATE_ON,
     STATE_OFF,
     STATE_HOME,
-    STATE_NOT_HOME,
-    STATE_UNKNOWN,
-    STATE_UNAVAILABLE
+    STATE_NOT_HOME
 )
 from homeassistant.helpers.event import (
     async_track_state_change
@@ -147,7 +145,8 @@ class HomeOccupancyBinarySensor(Entity):
 
         return entity_state in self.home_states
 
-    def comma_separated_list_to_string(self, input_list: list[str]) -> str:
+    @staticmethod
+    def comma_separated_list_to_string(input_list: list[str]) -> str:
         """Creates a string of a list in human-readable format"""
 
         who_is_home: str = ""
