@@ -1,1 +1,13 @@
 DOMAIN = "occupancy"
+PRESENCE_SENSOR = "presence_sensor"
+OCCUPANCY_SENSOR = "occupancy_sensor"
+CONF_NAME = "name"
+CONF_HOME_OCCUPANCY = "Home Occupancy"
+STATE_AWAY = "away"
+
+ATTR_FRIENDLY_NAME = "friendly_name"
+ATTR_GUESTS = "guests"
+ATTR_KNOWN_PEOPLE = "known_people"
+ATTR_LAST_TO_ARRIVE_HOME = "last_to_arrive_home"
+ATTR_LAST_TO_LEAVE = "last_to_leave"
+ATTR_WHO_IS_HOME = "who_is_home"
