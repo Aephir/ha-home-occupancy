@@ -24,7 +24,7 @@ DATA_SCHEMA = vol.Schema(
     {
         vol.Required(PRESENCE_SENSOR): str,  # cv.entity_id,
         vol.Required(CONF_NAME): str,  # cv.string,
-        vol.Optional(CONF_ADD_ANOTHER): str,  # cv.boolean,
+        vol.Optional(CONF_ADD_ANOTHER): bool,  # cv.boolean,
     }
 )
 
