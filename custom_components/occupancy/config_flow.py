@@ -46,6 +46,7 @@ async def validate_input(hass: HomeAssistant, data: dict) -> dict[str, Any]:
 
     return {"title": data[PRESENCE_SENSOR]}
 
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Hello World."""
 
@@ -54,8 +55,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     # This tells HA if it should be asking for updates, or it'll be notified of updates
     # automatically. This example uses PUSH, as the dummy hub will notify HA of
     # changes.
-    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
-
+    # This is deprecated. What to use instead??
+    # CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
 
     def __init__(self):
         self.data: dict[str, dict[str, str]] = {}
