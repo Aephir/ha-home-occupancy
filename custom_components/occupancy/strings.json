@@ -3,16 +3,20 @@
     "step": {
       "user": {
         "data": {
-          "sensor_1": "[%key:common::config_flow::data::sensor_1%]",
-          "sensor_2": "[%key:common::config_flow::data::sensor_2%]",
-          "sensor_3": "[%key:common::config_flow::data::sensor_3%]",
-          "sensor_4": "[%key:common::config_flow::data::sensor_4%]",
-          "sensor_5": "[%key:common::config_flow::data::sensor_5%]",
-          "sensor_6": "[%key:common::config_flow::data::sensor_6%]",
-          "sensor_7": "[%key:common::config_flow::data::sensor_7%]",
-          "sensor_8": "[%key:common::config_flow::data::sensor_8%]",
-          "sensor_9": "[%key:common::config_flow::data::sensor_9%]"
-        }
+          "presence_sensor": "EntityID of a presence sensor",
+          "name": "Name for the sensor"
+//          "sensor_1": "[%key:common::config_flow::data::sensor_1%]",
+//          "sensor_2": "[%key:common::config_flow::data::sensor_2%]",
+//          "sensor_3": "[%key:common::config_flow::data::sensor_3%]",
+//          "sensor_4": "[%key:common::config_flow::data::sensor_4%]",
+//          "sensor_5": "[%key:common::config_flow::data::sensor_5%]",
+//          "sensor_6": "[%key:common::config_flow::data::sensor_6%]",
+//          "sensor_7": "[%key:common::config_flow::data::sensor_7%]",
+//          "sensor_8": "[%key:common::config_flow::data::sensor_8%]",
+//          "sensor_9": "[%key:common::config_flow::data::sensor_9%]"
+        },
+        "description": "Enter the entity_id to use and a name for it...",
+        "title": "Entity IDs"
       }
     },
     "error": {
