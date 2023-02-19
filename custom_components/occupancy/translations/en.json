@@ -1,0 +1,22 @@
+{
+  "title": "Home Occupancy",
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "presence_sensor": "EntityID of a presence sensor",
+          "name": "Name for the sensor"
+        },
+        "description": "Enter the entity_id to use and a name for it...",
+        "title": "Entity IDs"
+      }
+    },
+    "error": {
+      "invalid_entity_id": "[%key:common::config_flow::error::invalid_entity_id%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
