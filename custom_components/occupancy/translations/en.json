@@ -5,7 +5,8 @@
       "user": {
         "data": {
           "presence_sensor": "EntityID of a presence sensor",
-          "name": "Name for the sensor"
+          "name": "Name for the sensor",
+          "add_another": "Add another?"
         },
         "description": "Enter the entity_id to use and a name for it...",
         "title": "Entity IDs"

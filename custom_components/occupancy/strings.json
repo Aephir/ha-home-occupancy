@@ -5,7 +5,8 @@
       "user": {
         "data": {
           "presence_sensor": "EntityID of a presence sensor",
-          "name": "Name for the sensor"
+          "name": "Name for the sensor",
+          "add_another": "Add another?",
 //          "sensor_1": "[%key:common::config_flow::data::sensor_1%]",
 //          "sensor_2": "[%key:common::config_flow::data::sensor_2%]",
 //          "sensor_3": "[%key:common::config_flow::data::sensor_3%]",
