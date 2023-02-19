@@ -45,7 +45,7 @@ async def async_setup_entry(
     if config_entry.options:
         config.update(config_entry.options)
     device_class = BinarySensorDeviceClass.OCCUPANCY
-    binary_sensors = [config[OCCUPANCY_SENSOR]]
+    binary_sensors = [HomeOccupancyBinarySensor()]
     async_add_entities(binary_sensors, update_before_add=True)
 
 
