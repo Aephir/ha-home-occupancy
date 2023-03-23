@@ -81,14 +81,14 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
-            try:
-                info_entity = await async_validate_input_entity_id(self.hass, user_input)
-                info_name = await async_validate_input_string(self.hass, user_input)
-            except InvalidEntityID:
-                errors["base"] = "invalid_entity_id"
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown"
+            # try:
+            #     info_entity = await async_validate_input_entity_id(self.hass, user_input)
+            #     info_name = await async_validate_input_string(self.hass, user_input)
+            # except InvalidEntityID:
+            #     errors["base"] = "invalid_entity_id"
+            # except Exception:  # pylint: disable=broad-except
+            #     _LOGGER.exception("Unexpected exception")
+            #     errors["base"] = "unknown"
 
             if not errors:
                 self.number_of_sensors += 1
