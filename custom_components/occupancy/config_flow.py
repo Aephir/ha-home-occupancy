@@ -79,7 +79,7 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.number_of_sensors = 0
 
     async def async_step_user(self, user_input=None):
-        errors = {}
+        errors: dict = {}
         if user_input is not None:
             # try:
             #     info_entity = await async_validate_input_entity_id(self.hass, user_input)
@@ -97,11 +97,12 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_NAME: str(user_input[CONF_NAME])
                 }
 
-                # If user ticked the box show this form again to add more sensors.
-                if user_input.get("add_another", True):
-                    return await self.async_step_user(user_input)
-                else:
-                    return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=user_input)
+                # # If user ticked the box show this form again to add more sensors.
+                # if user_input.get("add_another", True):
+                #     return await self.async_step_user(user_input)
+                # else:
+                #     return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=user_input)
+                return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=user_input)
 
         # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
         return self.async_show_form(
