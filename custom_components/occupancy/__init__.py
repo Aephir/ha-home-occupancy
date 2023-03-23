@@ -12,7 +12,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-        hass: core.HomeAssistant, entry: config_entries.ConfigEntry) -> bool:
+        hass: core.HomeAssistant,
+        entry: config_entries.ConfigEntry
+) -> bool:
     """Set up platform from a ConfigEntry."""
     integration = await async_get_integration(hass, DOMAIN)
     _LOGGER.info(STARTUP, integration.version)
@@ -33,13 +35,17 @@ async def async_setup_entry(
 
 
 async def options_update_listener(
-        hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry):
+        hass: core.HomeAssistant,
+        config_entry: config_entries.ConfigEntry
+):
     """Handle options update."""
     await hass.config_entries.async_reload(config_entry.entry_id)
 
 
 async def async_unload_entry(
-        hass: core.HomeAssistant, entry: config_entries.ConfigEntry) -> bool:
+        hass: core.HomeAssistant,
+        entry: config_entries.ConfigEntry
+) -> bool:
     """Unload a config entry."""
     unload_ok = all(
         await asyncio.gather(

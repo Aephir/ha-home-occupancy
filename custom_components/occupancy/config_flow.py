@@ -63,7 +63,7 @@ async def async_validate_input_string(hass: HomeAssistant, data: dict) -> dict[s
     return {"title": entity}
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for the Home Occupancy."""
 
     VERSION = 1
