@@ -41,11 +41,11 @@ async def async_setup_entry(
 ) -> None:
     """Add sensors for passed config_entry in HA."""
     config = hass.data[DOMAIN][config_entry.entry_id]
-    # Update our config to include new repos and remove those that have been removed.
     if config_entry.options:
         config.update(config_entry.options)
-    device_class = BinarySensorDeviceClass.OCCUPANCY
-    binary_sensors = [HomeOccupancyBinarySensor()]
+
+    # Initialize the binary_sensor with the configuration
+    binary_sensors = [HomeOccupancyBinarySensor(hass, config)]
     async_add_entities(binary_sensors, update_before_add=True)
 
 
@@ -63,7 +63,7 @@ async def async_setup_platform(
 class HomeOccupancyBinarySensor(Entity):
     """Occupancy Sensor."""
 
-    def __int__(self, hass: core.HomeAssistant, config):
+    def __init__(self, hass: core.HomeAssistant, config):
         super().__init__()
         self.attrs: dict[str, Any] = {ATTR_FRIENDLY_NAME: "Home occupancy"}
         self._name = OCCUPANCY_SENSOR
