@@ -104,7 +104,7 @@ class HomeOccupancyBinarySensor(Entity):
     async def async_update(self) -> None:
         """Update binary_sensor"""
 
-        presence_sensors: list[str] = [self.config[f"sensor_{i}"][PRESENCE_SENSOR] for i in range(len(self.config))]
+        presence_sensors: list[str] = [self.config[f"sensor_{i + 1}"][PRESENCE_SENSOR] for i in range(len(self.config))]
 
         home_handle = async_track_state_change(
             self.hass,
