@@ -123,9 +123,16 @@ class HomeOccupancyBinarySensor(Entity):
         )
 
         _LOGGER.error(f"Config values: {self.config.values()}")
-        self.attrs[ATTR_GUESTS] = self.async_is_on(
-            [val[PRESENCE_SENSOR] for val in self.config.values() if CONF_NAME in val and "guest" in val[CONF_NAME].lower()][0]
-        )
+        guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
+                         isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
+        if guest_sensors:
+            guest_sensor_entity_id = guest_sensors[0]
+        else:
+            guest_sensor_entity_id = None
+        if guest_sensor_entity_id:
+            self.attrs[ATTR_GUESTS] = await self.async_is_on(guest_sensor_entity_id)
+        else:
+            self.attrs[ATTR_GUESTS] = None
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
