@@ -39,7 +39,8 @@ async def async_validate_input_entity_id(hass: HomeAssistant, data: dict) -> dic
     valid_domains = [
         "person",
         "device_tracker",
-        "binary_sensor"
+        "binary_sensor",
+        "input_boolean"
     ]
 
     entity = cv.entity_id(data[PRESENCE_SENSOR])
