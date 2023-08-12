@@ -122,8 +122,9 @@ class HomeOccupancyBinarySensor(Entity):
             self.away_states
         )
 
+        _LOGGER.error(f"Config values: {self.config.values()}")
         self.attrs[ATTR_GUESTS] = self.async_is_on(
-            [val[PRESENCE_SENSOR] for val in self.config.values() if "guest" in val[CONF_NAME].lower()][0]
+            [val[PRESENCE_SENSOR] for val in self.config.values() if CONF_NAME in val and "guest" in val[CONF_NAME].lower()][0]
         )
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
