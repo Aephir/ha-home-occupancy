@@ -81,14 +81,14 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         errors: dict = {}
         if user_input is not None:
-            # try:
-            #     info_entity = await async_validate_input_entity_id(self.hass, user_input)
-            #     info_name = await async_validate_input_string(self.hass, user_input)
-            # except InvalidEntityID:
-            #     errors["base"] = "invalid_entity_id"
-            # except Exception:  # pylint: disable=broad-except
-            #     _LOGGER.exception("Unexpected exception")
-            #     errors["base"] = "unknown"
+            try:
+                info_entity = await async_validate_input_entity_id(self.hass, user_input)
+                info_name = await async_validate_input_string(self.hass, user_input)
+            except InvalidEntityID:
+                errors["base"] = "invalid_entity_id"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
 
             if not errors:
                 self.number_of_sensors += 1
@@ -97,12 +97,11 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_NAME: str(user_input[CONF_NAME])
                 }
 
-                # # If user ticked the box show this form again to add more sensors.
-                # if user_input.get("add_another", True):
-                #     return await self.async_step_user(user_input)
-                # else:
-                #     return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=user_input)
-                return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=user_input)
+                # If user ticked the box show this form again to add more sensors.
+                if user_input.get(CONF_ADD_ANOTHER, False):
+                    return await self.async_step_user()
+                else:
+                    return self.async_create_entry(title=CONF_HOME_OCCUPANCY, data=self.data)
 
         # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
         return self.async_show_form(
