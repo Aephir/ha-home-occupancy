@@ -18,7 +18,7 @@ from homeassistant.const import (
 from homeassistant.helpers.event import (
     async_track_state_change
 )
-
+import logging
 from .const import (
     DOMAIN,
     OCCUPANCY_SENSOR,
@@ -33,6 +33,8 @@ from .const import (
     ATTR_WHO_IS_HOME,
 )
 
+_LOGGER = logging.getLogger(__name__)
+
 
 async def async_setup_entry(
         hass: core.HomeAssistant,
@@ -40,6 +42,7 @@ async def async_setup_entry(
         async_add_entities,
 ) -> None:
     """Add sensors for passed config_entry in HA."""
+    _LOGGER.error("Setting up binary_sensor for Home Occupancy.")
     config = hass.data[DOMAIN][config_entry.entry_id]
     if config_entry.options:
         config.update(config_entry.options)

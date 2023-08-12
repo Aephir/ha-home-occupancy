@@ -1,4 +1,4 @@
-DOMAIN = "occupancy"
+DOMAIN = "home_occupancy"
 PRESENCE_SENSOR = "presence_sensor"
 OCCUPANCY_SENSOR = "occupancy_sensor"
 CONF_NAME = "name"
