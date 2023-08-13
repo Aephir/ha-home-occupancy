@@ -109,6 +109,47 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
+    async def async_get_options_flow(self):
+        return HomeOccupancyOptionsFlow(self)
+
+
+class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
+
+    def __init__(self, config_entry):
+        self.config_entry = config_entry
+        self.data: dict[str, dict[str, str]] = {}
+        self.number_of_sensors = 0
+
+    async def async_step_user(self, user_input=None):
+        errors: dict = {}
+        if user_input is not None:
+            try:
+                info_entity = await async_validate_input_entity_id(self.hass, user_input)
+                info_name = await async_validate_input_string(self.hass, user_input)
+            except InvalidEntityID:
+                errors["base"] = "invalid_entity_id"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
+
+            if not errors:
+                self.number_of_sensors += 1
+                self.data[f"sensor_{self.number_of_sensors}"] = {
+                    PRESENCE_SENSOR: user_input[PRESENCE_SENSOR],
+                    CONF_NAME: str(user_input[CONF_NAME])
+                }
+
+                # If user ticked the box show this form again to add more sensors.
+                if user_input.get(CONF_ADD_ANOTHER, False):
+                    return await self.async_step_user()
+                else:
+                    return self.async_create_entry(title="", data=self.data)
+
+        # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
+        return self.async_show_form(
+            step_id="user", data_schema=DATA_SCHEMA, errors=errors
+        )
+
 
 class InvalidEntityID(exceptions.InvalidEntityFormatError):
     """Error to indicate invalid entity_id."""
