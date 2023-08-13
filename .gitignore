@@ -9,4 +9,4 @@ venv
 /tests
 setup.cfg
 test.py
-.*
+.pre-commit-config.yaml
