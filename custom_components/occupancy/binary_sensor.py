@@ -191,11 +191,25 @@ class HomeOccupancyBinarySensor(Entity):
     #     _LOGGER.warning(f"Entity {entity_id} not found.")
     #     return False
 
-    async def async_check_is_on(self, entity_id) -> bool:
-        """Check state of entity"""
+    # async def async_check_is_on(self, entity_id) -> bool:
+    #     """Check state of entity"""
+    #     print(f"Checking entity ID {entity_id}.")
+    #     _LOGGER.debug(f"Checking entity ID {entity_id}.")
+    #     _LOGGER.debug("async_check_is_on IIs being called!!!!")
+    #     entity = self.hass.states.get(entity_id)
+    #     if entity:
+    #         is_home = entity.state in self.home_states
+    #         _LOGGER.debug(
+    #             f"Entity {entity_id} state: {entity.state}, considered home: {is_home}. Home states: {self.home_states}")
+    #         return is_home
+    #     _LOGGER.warning(f"Entity {entity_id} not found.")
+    #     return False
+
+    def is_on(self, entity_id) -> bool:
+        """Check state of entity (Synchronous version)"""
         print(f"Checking entity ID {entity_id}.")
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
-        _LOGGER.debug("async_check_is_on IIs being called!!!!")
+        _LOGGER.debug("is_on is being called!!!!")
         entity = self.hass.states.get(entity_id)
         if entity:
             is_home = entity.state in self.home_states
