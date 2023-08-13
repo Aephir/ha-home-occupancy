@@ -137,12 +137,13 @@ class HomeOccupancyBinarySensor(Entity):
         # _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
                          isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
+        _LOGGER.debug(f"Guest sensor is {guest_sensors}")
         if guest_sensors:
             guest_sensor_entity_id = guest_sensors[0]
         else:
             guest_sensor_entity_id = None
         if guest_sensor_entity_id:
-            self.attrs[ATTR_GUESTS] = await self.check_is_on(guest_sensor_entity_id)
+            self.attrs[ATTR_GUESTS] = self.check_is_on(guest_sensor_entity_id)
         else:
             self.attrs[ATTR_GUESTS] = None
 
