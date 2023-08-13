@@ -176,6 +176,8 @@ class HomeOccupancyBinarySensor(Entity):
 
     async def async_is_on(self, entity_id) -> bool:
         """Check state of entity"""
+        for sensor in self.presence_sensors:
+            _LOGGER.debug(f"Sensor {sensor} is on: {self.async_is_on(sensor)}")
         _LOGGER.debug(f"The entity ID is {entity_id}.")
         entity_state = self.hass.states.get(entity_id).state
         _LOGGER.debug(f"Entity {entity_id} state: {entity_state}")
