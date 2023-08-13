@@ -189,6 +189,7 @@ class HomeOccupancyBinarySensor(Entity):
 
     async def async_is_on(self, entity_id) -> bool:
         """Check state of entity"""
+        print(f"Checking entity ID {entity_id}.")
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
         entity = self.hass.states.get(entity_id)
         if entity:
