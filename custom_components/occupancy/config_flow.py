@@ -28,6 +28,10 @@ DATA_SCHEMA = vol.Schema(
     }
 )
 
+RECONFIG_OPTIONS = {
+    "full": "Full Reconfiguration",
+    "add": "Add New Entities"
+}
 
 async def async_validate_input_entity_id(hass: HomeAssistant, data: dict) -> dict[str, Any]:
     """Validate the user input is valid entity_id.
@@ -120,7 +124,23 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
         self.data: dict[str, dict[str, str]] = {}
         self.number_of_sensors = 0
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            if user_input["reconfig_option"] == "full":
+                # Handle full reconfiguration here, maybe reset some values or states
+                return await self.async_step_user()
+            elif user_input["reconfig_option"] == "add":
+                # Handle adding new entities here
+                return await self.async_step_add_entities()
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema({
+                vol.Required("reconfig_option"): vol.In(RECONFIG_OPTIONS)
+            })
+        )
+
+    async def shared_step_logic(self, user_input):
         errors: dict = {}
         if user_input is not None:
             try:
@@ -141,7 +161,7 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
 
                 # If user ticked the box show this form again to add more sensors.
                 if user_input.get(CONF_ADD_ANOTHER, False):
-                    return await self.async_step_user()
+                    return await self.async_step_add_entities()
                 else:
                     return self.async_create_entry(title="", data=self.data)
 
@@ -149,6 +169,17 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
+
+    async def async_step_add_entities(self, user_input=None):
+        return await self.shared_step_logic(user_input)
+
+    async def async_step_user(self, user_input=None):
+        for i in range(self.number_of_sensors):
+            sensor_number = i + 1
+            self.data.pop(f"sensor_{sensor_number}", None)
+        self.number_of_sensors = 0
+
+        return await self.async_step_add_entities(user_input)
 
 
 class InvalidEntityID(exceptions.InvalidEntityFormatError):

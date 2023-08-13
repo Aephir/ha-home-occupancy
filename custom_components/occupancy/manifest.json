@@ -3,9 +3,10 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/Aephir/ha-home-occupancy",
+  "issue_tracker": "https://github.com/Aephir/ha-home-occupancy/issues",
   "domain": "home_occupancy",
   "iot_class": "local_push",
   "name": "Home Occupancy",
   "requirements": [],
-  "version": "0.0.1"
+  "version": "0.0.2"
 }

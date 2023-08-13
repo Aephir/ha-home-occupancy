@@ -153,6 +153,7 @@ class HomeOccupancyBinarySensor(Entity):
         _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state}.")
 
         who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
+        _LOGGER.debug(f"Who is home: {who_is_home}.")
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
         self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
         if new_state in self.home_states:
