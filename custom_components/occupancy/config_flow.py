@@ -113,7 +113,7 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_get_options_flow(self):
+    def get_options_flow(self):
         return HomeOccupancyOptionsFlow(self)
 
 
