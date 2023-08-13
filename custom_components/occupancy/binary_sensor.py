@@ -142,7 +142,7 @@ class HomeOccupancyBinarySensor(Entity):
         else:
             guest_sensor_entity_id = None
         if guest_sensor_entity_id:
-            self.attrs[ATTR_GUESTS] = await self.async_is_on(guest_sensor_entity_id)
+            self.attrs[ATTR_GUESTS] = await self.async_check_is_on(guest_sensor_entity_id)
         else:
             self.attrs[ATTR_GUESTS] = None
 
@@ -164,9 +164,9 @@ class HomeOccupancyBinarySensor(Entity):
             ][0]
 
         _LOGGER.debug(f"Presence sensors: {self.presence_sensors}")
-        anyone_home = any(self.async_is_on(sensor) for sensor in self.presence_sensors)
+        anyone_home = any(self.async_check_is_on(sensor) for sensor in self.presence_sensors)
         for sensor in self.presence_sensors:
-            self.async_is_on(sensor)
+            self.async_check_is_on(sensor)
         _LOGGER.debug(f"Anyone home result: {anyone_home}")
         self._state = STATE_ON if anyone_home else STATE_OFF
         _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state}")
@@ -178,10 +178,10 @@ class HomeOccupancyBinarySensor(Entity):
         _LOGGER.debug(f"Home occupancy sensor state set to {self._state}.")
 
 
-    # async def async_is_on(self, entity_id) -> bool:
+    # async def async_check_is_on(self, entity_id) -> bool:
     #     """Check state of entity"""
     #     for sensor in self.presence_sensors:
-    #         _LOGGER.debug(f"Sensor {sensor} is on: {self.async_is_on(sensor)}")
+    #         _LOGGER.debug(f"Sensor {sensor} is on: {self.async_check_is_on(sensor)}")
     #     _LOGGER.debug(f"The entity ID is {entity_id}.")
     #     entity_state = self.hass.states.get(entity_id).state
     #     _LOGGER.debug(f"Entity {entity_id} state: {entity_state}")
@@ -191,11 +191,11 @@ class HomeOccupancyBinarySensor(Entity):
     #     _LOGGER.warning(f"Entity {entity_id} not found.")
     #     return False
 
-    async def async_is_on(self, entity_id) -> bool:
+    async def async_check_is_on(self, entity_id) -> bool:
         """Check state of entity"""
         print(f"Checking entity ID {entity_id}.")
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
-        _LOGGER.debug("ASYNC_IS_ON IIs being called!!!!")
+        _LOGGER.debug("async_check_is_on IIs being called!!!!")
         entity = self.hass.states.get(entity_id)
         if entity:
             is_home = entity.state in self.home_states
