@@ -163,7 +163,10 @@ class HomeOccupancyBinarySensor(Entity):
                 self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
             ][0]
 
+        _LOGGER.debug(f"Presence sensors: {self.presence_sensors}")
         anyone_home = any(self.async_is_on(sensor) for sensor in self.presence_sensors)
+        for sensor in self.presence_sensors:
+            self.async_is_on(sensor)
         _LOGGER.debug(f"Anyone home result: {anyone_home}")
         self._state = STATE_ON if anyone_home else STATE_OFF
         _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state}")
