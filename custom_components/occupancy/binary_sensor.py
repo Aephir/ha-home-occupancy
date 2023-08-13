@@ -133,7 +133,7 @@ class HomeOccupancyBinarySensor(Entity):
     async def async_update(self) -> None:
         """Update binary_sensor"""
 
-        _LOGGER.debug("Updating home occupancy sensor."
+        _LOGGER.debug("Updating home occupancy sensor.")
         # _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
                          isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
