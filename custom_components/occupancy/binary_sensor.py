@@ -77,6 +77,27 @@ class HomeOccupancyBinarySensor(Entity):
         self.home_states: list[str] = [STATE_ON, STATE_HOME]
         self.away_states: list[str] = [STATE_OFF, STATE_NOT_HOME, STATE_AWAY]
         self.hass = hass
+        self.presence_sensors: list[str] = [self.config[key][PRESENCE_SENSOR] for key in self.config if key.startswith("sensor_")]
+
+    async def async_added_to_hass(self):
+        """Run when entity is added to hass."""
+        self.presence_sensors = [self.config[key][PRESENCE_SENSOR] for key in self.config if key.startswith("sensor_")]
+
+        async_track_state_change(
+            self.hass,
+            self.presence_sensors,
+            self.async_track_home,
+            self.away_states,
+            self.home_states
+        )
+
+        async_track_state_change(
+            self.hass,
+            self.presence_sensors,
+            self.async_track_home,
+            self.home_states,
+            self.away_states
+        )
 
     @property
     def name(self) -> str:
@@ -103,24 +124,6 @@ class HomeOccupancyBinarySensor(Entity):
 
     async def async_update(self) -> None:
         """Update binary_sensor"""
-
-        presence_sensors: list[str] = [self.config[key][PRESENCE_SENSOR] for key in self.config if key.startswith("sensor_")]
-
-        home_handle = async_track_state_change(
-            self.hass,
-            presence_sensors,
-            self.async_track_home,
-            self.away_states,
-            self.home_states
-        )
-
-        away_handle = async_track_state_change(
-            self.hass,
-            presence_sensors,
-            self.async_track_home,
-            self.home_states,
-            self.away_states
-        )
 
         _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
@@ -149,7 +152,7 @@ class HomeOccupancyBinarySensor(Entity):
                 self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
             ][0]
 
-        anyone_home = any(self.async_is_on(sensor) for sensor in presence_sensors)
+        anyone_home = any(self.async_is_on(sensor) for sensor in self.presence_sensors)
         self._state = STATE_ON if anyone_home else STATE_OFF
 
         self.async_schedule_update_ha_state()
