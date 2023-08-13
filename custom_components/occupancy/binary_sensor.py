@@ -191,6 +191,7 @@ class HomeOccupancyBinarySensor(Entity):
         """Check state of entity"""
         print(f"Checking entity ID {entity_id}.")
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
+        _LOGGER.debug("ASYNC_IS_ON IIs being called!!!!")
         entity = self.hass.states.get(entity_id)
         if entity:
             is_home = entity.state in self.home_states
