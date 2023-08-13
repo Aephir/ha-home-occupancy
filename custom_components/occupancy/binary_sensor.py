@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any
+from datetime import timedelta
 from collections.abc import Callable
 from homeassistant.helpers.entity import Entity
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
@@ -18,6 +19,7 @@ from homeassistant.const import (
 from homeassistant.helpers.event import (
     async_track_state_change
 )
+from homeassistant.helpers.event import async_track_time_interval
 import logging
 from .const import (
     DOMAIN,
@@ -77,7 +79,7 @@ class HomeOccupancyBinarySensor(Entity):
         self.home_states: list[str] = [STATE_ON, STATE_HOME]
         self.away_states: list[str] = [STATE_OFF, STATE_NOT_HOME, STATE_AWAY]
         self.hass = hass
-        self.presence_sensors: list[str] = [self.config[key][PRESENCE_SENSOR] for key in self.config if key.startswith("sensor_")]
+        self.presence_sensors: list[str]
 
     async def async_added_to_hass(self):
         """Run when entity is added to hass."""
@@ -97,6 +99,12 @@ class HomeOccupancyBinarySensor(Entity):
             self.async_track_home,
             self.home_states,
             self.away_states
+        )
+
+        async_track_time_interval(
+            self.hass,
+            self.async_update,
+            timedelta(minutes=10)
         )
 
     @property
@@ -125,7 +133,8 @@ class HomeOccupancyBinarySensor(Entity):
     async def async_update(self) -> None:
         """Update binary_sensor"""
 
-        _LOGGER.error(f"Config values: {self.config.values()}")
+        _LOGGER.debug("Updating home occupancy sensor."
+        # _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
                          isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
         if guest_sensors:
@@ -139,6 +148,8 @@ class HomeOccupancyBinarySensor(Entity):
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
+
+        _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state}.")
 
         who_is_home = [self.config[f"sensor_{i}"][CONF_NAME] for i in range(len(self.config))]
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
@@ -157,12 +168,15 @@ class HomeOccupancyBinarySensor(Entity):
 
         self.async_schedule_update_ha_state()
 
+        _LOGGER.debug(f"Home occupancy sensor state set to {self._state}.")
+
     async def async_is_on(self, entity_id) -> bool:
         """Check state of entity"""
-
-        entity_state = self.hass.states.get(entity_id).state
-
-        return entity_state in self.home_states
+        entity = self.hass.states.get(entity_id)
+        if entity:
+            return entity.state in self.home_states
+        _LOGGER.warning(f"Entity {entity_id} not found.")
+        return False
 
     @staticmethod
     def comma_separated_list_to_string(input_list: list[str]) -> str:
