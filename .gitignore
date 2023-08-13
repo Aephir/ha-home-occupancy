@@ -9,3 +9,4 @@ venv
 /tests
 setup.cfg
 test.py
+.*
