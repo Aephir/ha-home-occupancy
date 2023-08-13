@@ -149,6 +149,11 @@ class HomeOccupancyBinarySensor(Entity):
                 self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
             ][0]
 
+        anyone_home = any(self.async_is_on(sensor) for sensor in presence_sensors)
+        self._state = STATE_ON if anyone_home else STATE_OFF
+
+        self.async_schedule_update_ha_state()
+
     async def async_is_on(self, entity_id) -> bool:
         """Check state of entity"""
 
