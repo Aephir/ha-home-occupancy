@@ -146,6 +146,13 @@ class HomeOccupancyBinarySensor(Entity):
             self.attrs[ATTR_GUESTS] = self.check_is_on(guest_sensor_entity_id)
         else:
             self.attrs[ATTR_GUESTS] = None
+        self.who_is_home()
+        self.last_to_arrive_and_leave()
+
+    def who_is_home(self):
+        who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
+        self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
+        self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
