@@ -113,7 +113,7 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    def get_options_flow(self):
+    async def async_get_options_flow(self):
         return HomeOccupancyOptionsFlow(self)
 
 
@@ -163,7 +163,7 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
                 if user_input.get(CONF_ADD_ANOTHER, False):
                     return await self.async_step_add_entities()
                 else:
-                    return self.async_create_entry(title="", data=self.data)
+                    return self.async_create_entry(title=None, data=self.data)
 
         # If there is no user input or there were errors, show the form again, including any errors that were found with the input.
         return self.async_show_form(
