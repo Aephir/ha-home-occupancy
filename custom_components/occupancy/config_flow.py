@@ -6,6 +6,7 @@ from typing import Any
 from homeassistant import config_entries, exceptions
 from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
+from homeassistant.core import callback
 
 import voluptuous as vol
 from .const import (
@@ -113,7 +114,8 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
-    async def async_get_options_flow(self):
+    @callback
+    def async_get_options_flow(self):
         return HomeOccupancyOptionsFlow(self)
 
 
