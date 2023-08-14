@@ -137,7 +137,6 @@ class HomeOccupancyBinarySensor(Entity):
         # _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
                          isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
-        _LOGGER.debug(f"Guest sensor is {guest_sensors}")
         if guest_sensors:
             guest_sensor_entity_id = guest_sensors[0]
         else:
@@ -147,12 +146,12 @@ class HomeOccupancyBinarySensor(Entity):
         else:
             self.attrs[ATTR_GUESTS] = None
         self.who_is_home()
-        self.last_to_arrive_and_leave()
 
     def who_is_home(self):
         who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
         self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
+        _LOGGER.debug(f"Who is home: {who_is_home}.")
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
@@ -172,53 +171,17 @@ class HomeOccupancyBinarySensor(Entity):
                 self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
             ][0]
 
-        _LOGGER.debug(f"Presence sensors: {self.presence_sensors}")
         anyone_home = any(self.check_is_on(sensor) for sensor in self.presence_sensors)
         for sensor in self.presence_sensors:
             self.check_is_on(sensor)
-        _LOGGER.debug(f"Anyone home result: {anyone_home}")
         self._state = STATE_ON if anyone_home else STATE_OFF
         _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state}")
 
-        _LOGGER.debug("Scheduling state update for home occupancy sensor.")
         self.async_schedule_update_ha_state()
-        _LOGGER.debug("State update scheduled for home occupancy sensor.")
-
-        _LOGGER.debug(f"Home occupancy sensor state set to {self._state}.")
-
-
-    # async def check_is_on(self, entity_id) -> bool:
-    #     """Check state of entity"""
-    #     for sensor in self.presence_sensors:
-    #         _LOGGER.debug(f"Sensor {sensor} is on: {self.check_is_on(sensor)}")
-    #     _LOGGER.debug(f"The entity ID is {entity_id}.")
-    #     entity_state = self.hass.states.get(entity_id).state
-    #     _LOGGER.debug(f"Entity {entity_id} state: {entity_state}")
-    #     entity = self.hass.states.get(entity_id)
-    #     if entity:
-    #         return entity.state in self.home_states
-    #     _LOGGER.warning(f"Entity {entity_id} not found.")
-    #     return False
-
-    # async def check_is_on(self, entity_id) -> bool:
-    #     """Check state of entity"""
-    #     print(f"Checking entity ID {entity_id}.")
-    #     _LOGGER.debug(f"Checking entity ID {entity_id}.")
-    #     _LOGGER.debug("check_is_on IIs being called!!!!")
-    #     entity = self.hass.states.get(entity_id)
-    #     if entity:
-    #         is_home = entity.state in self.home_states
-    #         _LOGGER.debug(
-    #             f"Entity {entity_id} state: {entity.state}, considered home: {is_home}. Home states: {self.home_states}")
-    #         return is_home
-    #     _LOGGER.warning(f"Entity {entity_id} not found.")
-    #     return False
 
     def check_is_on(self, entity_id) -> bool:
         """Check state of entity (Synchronous version)"""
-        print(f"Checking entity ID {entity_id}.")
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
-        _LOGGER.debug("is_on is being called!!!!")
         entity = self.hass.states.get(entity_id)
         if entity:
             is_home = entity.state in self.home_states
