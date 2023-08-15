@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any
+import asyncio
 from datetime import timedelta
 from collections.abc import Callable
 from homeassistant.helpers.entity import Entity
@@ -107,6 +108,9 @@ class HomeOccupancyBinarySensor(Entity):
             timedelta(minutes=10)
         )
 
+        await asyncio.sleep(15)  # Delete once you have a better solution.
+        await self.async_update()
+
     @property
     def name(self) -> str:
         """Return the name of the entity."""
@@ -183,6 +187,7 @@ class HomeOccupancyBinarySensor(Entity):
         """Check state of entity (Synchronous version)"""
         _LOGGER.debug(f"Checking entity ID {entity_id}.")
         entity = self.hass.states.get(entity_id)
+        _LOGGER.debug(f"Entity {entity_id} state: {entity.state}")
         if entity:
             is_home = entity.state in self.home_states
             _LOGGER.debug(

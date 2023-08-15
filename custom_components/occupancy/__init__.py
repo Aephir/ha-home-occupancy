@@ -33,29 +33,29 @@ async def async_setup_entry(
         hass.config_entries.async_forward_entry_setup(entry, "binary_sensor")
     )
 
-    def determine_initial_state(event):
-        """
-        Should not be necessary. This is a workaround.
-        I should look at the `async_update` method, as this should be enough..
-        """
-        tracked_data = entry.data  # Fetching the entry data which contains your entities
-        tracked_entity_ids = [data[PRESENCE_SENSOR] for key, data in tracked_data.items() if key.startswith("sensor_")]
-
-        for entity_id in tracked_entity_ids:
-            entity = hass.states.get(entity_id)  # Fetch the entity using its entity_id
-            if entity:
-                entity.async_update()  # Or entity.async_schedule_update_ha_state(True) if async_update contains `await`
-
-        # After updating the tracked entities, update the binary_sensor.occupancy_sensor as well
-        occupancy_sensor = hass.states.get("binary_sensor.occupancy_sensor")
-        if occupancy_sensor:
-            occupancy_sensor.async_update()  # Or occupancy_sensor.async_schedule_update_ha_state(True) if async_update contains `await`
-
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, determine_initial_state)
-
-    entry.add_update_listener(async_reload_entry)
-
-    return True
+    # def determine_initial_state(event):
+    #     """
+    #     Should not be necessary. This is a workaround.
+    #     I should look at the `async_update` method, as this should be enough..
+    #     """
+    #     tracked_data = entry.data  # Fetching the entry data which contains your entities
+    #     tracked_entity_ids = [data[PRESENCE_SENSOR] for key, data in tracked_data.items() if key.startswith("sensor_")]
+    #
+    #     for entity_id in tracked_entity_ids:
+    #         entity = hass.states.get(entity_id)  # Fetch the entity using its entity_id
+    #         if entity:
+    #             entity.async_update()  # Or entity.async_schedule_update_ha_state(True) if async_update contains `await`
+    #
+    #     # After updating the tracked entities, update the binary_sensor.occupancy_sensor as well
+    #     occupancy_sensor = hass.states.get("binary_sensor.occupancy_sensor")
+    #     if occupancy_sensor:
+    #         occupancy_sensor.async_update()  # Or occupancy_sensor.async_schedule_update_ha_state(True) if async_update contains `await`
+    #
+    # hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, determine_initial_state)
+    #
+    # entry.add_update_listener(async_reload_entry)
+    #
+    # return True
 
 
 async def options_update_listener(
