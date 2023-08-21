@@ -1,6 +1,6 @@
 # Home Occupancy for Home Assistant
 
-__OBS!__ This should be considered alpha, perhaps very early beta. I will not have much time to work on this, so this state might persist for quite some time.
+__OBS!__ This should be considered very early beta. I will not have much time to work on this, so this state might persist for quite some time.
 You are of course welcome to fork (or ask to be added as maintainer) if you feel like you can contribute.
 Otherwise, please use only if you don't need this for anything crucial. 
 

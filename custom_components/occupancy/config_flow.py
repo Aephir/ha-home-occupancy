@@ -103,6 +103,8 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_NAME: str(user_input[CONF_NAME])
                 }
 
+                self.data["number_of_sensors"] = self.number_of_sensors
+
                 # If user ticked the box show this form again to add more sensors.
                 if user_input.get(CONF_ADD_ANOTHER, False):
                     return await self.async_step_user()

@@ -152,7 +152,13 @@ class HomeOccupancyBinarySensor(Entity):
         self.who_is_home()
 
     def who_is_home(self):
-        who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
+        who_is_home = [
+            self.config[f"sensor_{i + 1}"]["name"]
+            for i in range(self.config["number_of_sensors"])
+            if self.hass.states.get(self.config[f"sensor_{i + 1}"]["entity_id"]) and
+               self.hass.states.get(self.config[f"sensor_{i + 1}"]["entity_id"]).state.lower() == "home"
+        ]
+        # who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
         self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
         _LOGGER.debug(f"Who is home: {who_is_home}.")
