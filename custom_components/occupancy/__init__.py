@@ -33,6 +33,8 @@ async def async_setup_entry(
         hass.config_entries.async_forward_entry_setup(entry, "binary_sensor")
     )
 
+    return True
+
     # def determine_initial_state(event):
     #     """
     #     Should not be necessary. This is a workaround.
