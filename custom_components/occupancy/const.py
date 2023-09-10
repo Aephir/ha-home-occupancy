@@ -13,6 +13,8 @@ ATTR_LAST_TO_ARRIVE_HOME = "last_to_arrive_home"
 ATTR_LAST_TO_LEAVE = "last_to_leave"
 ATTR_WHO_IS_HOME = "who_is_home"
 
+VERSION = "0.0.1"
+
 STARTUP = """
   ___
 /  _  \    ___    ___    _   _    ____      __   _   _   _      __   _    _
@@ -24,5 +26,5 @@ STARTUP = """
 
 An occupancy binary_sensor that incorporates any person.*, device_tracker.* or binary_senor.*
 This means including e.g. a binary_senor.guest_mode in the occupancy sensor.
-Additionally, i keeps a list of who is home, and who was the last  arrive/leave. 
+Additionally, it keeps a list of who is home, and who was the last to arrive/leave. 
 """
