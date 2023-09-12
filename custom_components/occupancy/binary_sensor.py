@@ -208,13 +208,19 @@ class HomeOccupancyBinarySensor(Entity):
 
         who_is_home: str = ""
         length = len(input_list)
+        _LOGGER.debug("input_list")
+        _LOGGER.debug(input_list)
+        _LOGGER.debug("type of input_list")
+        _LOGGER.debug(type(input_list))
 
         if length == 1:
-            return str(input_list)
+            who_is_home = input_list[0]
+        elif length == 2:
+            who_is_home = input_list[0] + " and " + input_list[1]
         else:
             for i in range(length):
                 if (i - 2) < length:
                     who_is_home += input_list[i] + ", "
                 else:
                     who_is_home += input_list[i] + ", and " + input_list[i + 1]
-                    return who_is_home
+        return who_is_home
