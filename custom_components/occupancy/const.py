@@ -1,6 +1,6 @@
 DOMAIN = "home_occupancy"
 PRESENCE_SENSOR = "presence_sensor"
-OCCUPANCY_SENSOR = "occupancy_sensor"
+OCCUPANCY_SENSOR = "home_occupancy"
 CONF_NAME = "name"
 CONF_HOME_OCCUPANCY = "Home Occupancy"
 STATE_AWAY = "away"

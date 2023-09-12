@@ -94,13 +94,13 @@ class HomeOccupancyBinarySensor(Entity):
             self.home_states
         )
 
-        async_track_state_change(
-            self.hass,
-            self.presence_sensors,
-            self.async_track_home,
-            self.home_states,
-            self.away_states
-        )
+        # async_track_state_change(
+        #     self.hass,
+        #     self.presence_sensors,
+        #     self.async_track_home,
+        #     self.home_states,
+        #     self.away_states
+        # )
 
         async_track_time_interval(
             self.hass,
@@ -208,10 +208,6 @@ class HomeOccupancyBinarySensor(Entity):
 
         who_is_home: str = ""
         length = len(input_list)
-        _LOGGER.debug("input_list")
-        _LOGGER.debug(input_list)
-        _LOGGER.debug("type of input_list")
-        _LOGGER.debug(type(input_list))
 
         if length == 1:
             who_is_home = input_list[0]
