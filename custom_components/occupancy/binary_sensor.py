@@ -45,7 +45,7 @@ async def async_setup_entry(
         async_add_entities,
 ) -> None:
     """Add sensors for passed config_entry in HA."""
-    _LOGGER.error("Setting up binary_sensor for Home Occupancy.")
+    _LOGGER.debug("Setting up entry for Home Occupancy.")
     config = hass.data[DOMAIN][config_entry.entry_id]
     if config_entry.options:
         config.update(config_entry.options)
@@ -62,6 +62,7 @@ async def async_setup_platform(
         discovery_info: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the sensor platform."""
+    _LOGGER.debug("Setting up platform for Home Occupancy.")
     binary_sensors = [config[OCCUPANCY_SENSOR]]
     async_add_entities(binary_sensors, update_before_add=True)
 
@@ -70,6 +71,7 @@ class HomeOccupancyBinarySensor(Entity):
     """Occupancy Sensor."""
 
     def __init__(self, hass: core.HomeAssistant, config):
+        _LOGGER.debug("Initializing HomeOccupancyBinarySensor class for Home Occupancy.")
         super().__init__()
         self.attrs: dict[str, Any] = {ATTR_FRIENDLY_NAME: "Home occupancy"}
         self._name = OCCUPANCY_SENSOR
@@ -93,14 +95,6 @@ class HomeOccupancyBinarySensor(Entity):
             self.away_states,
             self.home_states
         )
-
-        # async_track_state_change(
-        #     self.hass,
-        #     self.presence_sensors,
-        #     self.async_track_home,
-        #     self.home_states,
-        #     self.away_states
-        # )
 
         async_track_time_interval(
             self.hass,
@@ -161,15 +155,15 @@ class HomeOccupancyBinarySensor(Entity):
         # who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
         self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
-        _LOGGER.debug(f"Who is home: {who_is_home}.")
+        _LOGGER.debug(f"Who is home: {who_is_home} in who_is_home.")
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
 
-        _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state}.")
+        _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state} in async_track_home.")
 
         who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
-        _LOGGER.debug(f"Who is home: {who_is_home}.")
+        _LOGGER.debug(f"Who is home: {who_is_home} in async_ttrack_home.")
         self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
         self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
         if new_state in self.home_states:
