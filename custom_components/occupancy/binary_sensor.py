@@ -160,6 +160,9 @@ class HomeOccupancyBinarySensor(Entity):
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
 
+        if old_state == new_state:
+            return
+
         _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state} in async_track_home.")
 
         who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
