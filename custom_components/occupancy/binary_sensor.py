@@ -216,4 +216,5 @@ class HomeOccupancyBinarySensor(Entity):
                     who_is_home += input_list[i] + ", "
                 else:
                     who_is_home += input_list[i] + ", and " + input_list[i + 1]
+        _LOGGER.debug(f"Lis of who is home is {who_is_home}.")
         return who_is_home
