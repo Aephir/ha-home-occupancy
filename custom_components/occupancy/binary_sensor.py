@@ -128,7 +128,7 @@ class HomeOccupancyBinarySensor(Entity):
     def extra_state_attributes(self) -> dict[str, Any]:
         return self.attrs
 
-    async def async_update(self) -> None:
+    async def async_update(self, now=None) -> None:
         """Update binary_sensor"""
 
         _LOGGER.debug("Updating home occupancy sensor.")
