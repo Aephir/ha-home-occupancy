@@ -84,7 +84,7 @@ class HomeOccupancyBinarySensor(Entity):
         self.home_states: list[str] = [STATE_ON, STATE_HOME]
         self.away_states: list[str] = [STATE_OFF, STATE_NOT_HOME, STATE_AWAY]
         self.hass = hass
-        self.presence_sensors: list[str]
+        self.presence_sensors: list[str] = []
 
     async def async_added_to_hass(self):
         """Run when entity is added to hass."""
@@ -115,6 +115,8 @@ class HomeOccupancyBinarySensor(Entity):
 
             self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, _async_set_initial_state)
 
+        _LOGGER.debug(f"Presence sensors list: {self.presence_sensors}")
+
     @property
     def name(self) -> str:
         """Return the name of the entity."""
@@ -141,6 +143,10 @@ class HomeOccupancyBinarySensor(Entity):
     async def async_update(self, now=None) -> None:
         """Update binary_sensor"""
 
+        if not self.presence_sensors:
+            _LOGGER.debug("Presence sensors not yet initialized.")
+            return
+
         _LOGGER.debug("Updating home occupancy sensor.")
         # _LOGGER.error(f"Config values: {self.config.values()}")
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
@@ -154,6 +160,11 @@ class HomeOccupancyBinarySensor(Entity):
         else:
             self.attrs[ATTR_GUESTS] = None
         self.who_is_home()
+
+        anyone_home = any(self.check_is_on(sensor) for sensor in self.presence_sensors)
+        self._state = STATE_ON if anyone_home else STATE_OFF
+
+        _LOGGER.debug(f"Home occupancy sensor state set to: {self._state} by async_update")
 
     def who_is_home(self):
         who_is_home = [
@@ -192,7 +203,7 @@ class HomeOccupancyBinarySensor(Entity):
         for sensor in self.presence_sensors:
             self.check_is_on(sensor)
         self._state = STATE_ON if anyone_home else STATE_OFF
-        _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state}")
+        _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state} by async_track_home")
 
         self.async_schedule_update_ha_state()
 
