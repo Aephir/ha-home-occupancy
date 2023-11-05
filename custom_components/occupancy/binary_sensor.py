@@ -77,6 +77,8 @@ class HomeOccupancyBinarySensor(Entity):
         super().__init__()
         self.attrs: dict[str, Any] = {ATTR_FRIENDLY_NAME: "Home occupancy"}
         self._name = OCCUPANCY_SENSOR
+        self.entity_id = f"binary_sensor.{DOMAIN}_{self._name}"
+        self._attr_unique_id = f"{DOMAIN}_{self._name}_unique_id"
         self._state = None
         self._available = True
         self._attr_unique_id = f"combined_{self._name}"
@@ -85,6 +87,8 @@ class HomeOccupancyBinarySensor(Entity):
         self.away_states: list[str] = [STATE_OFF, STATE_NOT_HOME, STATE_AWAY]
         self.hass = hass
         self.presence_sensors: list[str] = []
+        self.last_to_leave = None
+        self.last_to_arrive = None
 
     async def async_added_to_hass(self):
         """Run when entity is added to hass."""
@@ -136,88 +140,100 @@ class HomeOccupancyBinarySensor(Entity):
     def state(self) -> str | None:
         return self._state
 
+    # @property
+    # def extra_state_attributes(self) -> dict[str, Any]:
+    #     return self.attrs
+
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return self.attrs
+        """Return extra state attributes."""
+        return {
+            'last_to_leave': self.last_to_leave,
+            'last_to_arrive': self.last_to_arrive,
+            **self.attrs  # Include other attributes already set in self.attrs
+        }
 
     async def async_update(self, now=None) -> None:
         """Update binary_sensor"""
 
-        if not self.presence_sensors:
-            _LOGGER.debug("Presence sensors not yet initialized.")
-            return
-
-        _LOGGER.debug("Updating home occupancy sensor.")
-        # _LOGGER.error(f"Config values: {self.config.values()}")
+        # Retrieve guest sensor state
         guest_sensors = [val[PRESENCE_SENSOR] for val in self.config.values() if
                          isinstance(val, dict) and CONF_NAME in val and "guest" in val[CONF_NAME].lower()]
-        if guest_sensors:
-            guest_sensor_entity_id = guest_sensors[0]
-        else:
-            guest_sensor_entity_id = None
-        if guest_sensor_entity_id:
-            self.attrs[ATTR_GUESTS] = self.check_is_on(guest_sensor_entity_id)
-        else:
-            self.attrs[ATTR_GUESTS] = None
-        self.who_is_home()
+        guest_sensor_entity_id = guest_sensors[0] if guest_sensors else None
+        guest_present = self.check_is_on(guest_sensor_entity_id) if guest_sensor_entity_id else None
 
+        # Calculate who is home and other attributes
+        new_attrs = self.who_is_home()
+        new_attrs[ATTR_GUESTS] = guest_present
+
+        # Determine if anyone is home
         anyone_home = any(self.check_is_on(sensor) for sensor in self.presence_sensors)
-        self._state = STATE_ON if anyone_home else STATE_OFF
+        new_state = STATE_ON if anyone_home else STATE_OFF
 
-        _LOGGER.debug(f"Home occupancy sensor state set to: {self._state} by async_update")
+        # Check for changes in attributes and state
+        attributes_changed = any(self.attrs.get(attr) != new_attrs.get(attr) for attr in new_attrs)
+        state_changed = self._state != new_state
 
-    def who_is_home(self):
+        # Update state and attributes if there are changes
+        if state_changed or attributes_changed:
+            self._state = new_state
+            self.attrs.update(new_attrs)
+            self.async_write_ha_state()  # This will schedule an update to HA
+
+    def who_is_home(self) -> dict:
+        """Determine who is home and return attributes."""
         who_is_home = [
             self.config[f"sensor_{i + 1}"]["name"]
             for i in range(self.config["number_of_sensors"])
-            if self.hass.states.get(self.config[f"sensor_{i + 1}"]["presence_sensor"]) and
-               self.hass.states.get(self.config[f"sensor_{i + 1}"]["presence_sensor"]).state.lower() == "home"
+            if self.hass.states.get(self.config[f"sensor_{i + 1}"][PRESENCE_SENSOR]) and
+               self.hass.states.get(self.config[f"sensor_{i + 1}"][PRESENCE_SENSOR]).state.lower() == "home"
         ]
-        # who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
-        self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
-        self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
-        _LOGGER.debug(f"Who is home: {who_is_home} in who_is_home.")
+
+        # Construct the dictionary of attributes
+        attributes = {
+            ATTR_KNOWN_PEOPLE: str(len(who_is_home)),
+            ATTR_WHO_IS_HOME: self.comma_separated_list_to_string(who_is_home),
+            # Include other attributes like last_to_leave and last_to_arrive if needed
+        }
+
+        return attributes
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
-        """Track state changes of associated device_tracker, persson, and binary_sensor entities"""
+        """Track state changes of associated device_tracker, person, and binary_sensor entities"""
 
         if old_state == new_state:
             return
 
-        _LOGGER.debug(f"Entity {entity_id} changed from {old_state} to {new_state} in async_track_home.")
+        # Retrieve the person's name associated with the entity_id from self.config
+        person_name = next((config[CONF_NAME] for key, config in self.config.items()
+                            if PRESENCE_SENSOR in config and config[PRESENCE_SENSOR] == entity_id), "unknown")
 
-        who_is_home = [val[CONF_NAME] for val in self.config.values() if isinstance(val, dict) and CONF_NAME in val]
-        _LOGGER.debug(f"Who is home: {who_is_home} in async_ttrack_home.")
-        self.attrs[ATTR_KNOWN_PEOPLE] = str(len(who_is_home))
-        self.attrs[ATTR_WHO_IS_HOME] = self.comma_separated_list_to_string(who_is_home)
-        if new_state in self.home_states:
-            self.attrs[ATTR_LAST_TO_ARRIVE_HOME] = [
-                self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
-            ][0]
-        if new_state in self.away_states:
-            self.attrs[ATTR_LAST_TO_LEAVE] = [
-                self.config[key][CONF_NAME] for key, val in self.config.items() if val[PRESENCE_SENSOR] == entity_id
-            ][0]
+        # Get current attributes and see if they will change
+        new_attrs = self.who_is_home()
+        if new_state.state in self.home_states:
+            new_attrs[ATTR_LAST_TO_ARRIVE_HOME] = person_name
+        if new_state.state in self.away_states:
+            new_attrs[ATTR_LAST_TO_LEAVE] = person_name
 
+        # Check for changes in attributes
+        attributes_changed = any(self.attrs.get(attr) != new_attrs.get(attr) for attr in new_attrs)
+
+        # Determine if anyone is home
         anyone_home = any(self.check_is_on(sensor) for sensor in self.presence_sensors)
-        for sensor in self.presence_sensors:
-            self.check_is_on(sensor)
-        self._state = STATE_ON if anyone_home else STATE_OFF
-        _LOGGER.debug(f"Setting home occupancy sensor's state to: {self._state} by async_track_home")
+        new_sensor_state = STATE_ON if anyone_home else STATE_OFF
 
-        self.async_schedule_update_ha_state()
+        # Check if the state or any attributes have changed before updating
+        if self._state != new_sensor_state or attributes_changed:
+            self._state = new_sensor_state
+            self.attrs.update(new_attrs)
+            self.async_write_ha_state()
 
     def check_is_on(self, entity_id) -> bool:
         """Check state of entity (Synchronous version)"""
-        _LOGGER.debug(f"Checking entity ID {entity_id}.")
         entity = self.hass.states.get(entity_id)
-        _LOGGER.debug(f"Entity {entity_id} state: {entity.state}")
         if entity:
             is_home = entity.state in self.home_states
-            _LOGGER.debug(
-                f"Entity {entity_id} state: {entity.state}, considered home: {is_home}. Home states: {self.home_states}")
             return is_home
-        _LOGGER.warning(f"Entity {entity_id} not found.")
         return False
 
     @staticmethod
@@ -237,5 +253,4 @@ class HomeOccupancyBinarySensor(Entity):
                     who_is_home += input_list[i] + ", "
                 else:
                     who_is_home += input_list[i] + ", and " + input_list[i + 1]
-        _LOGGER.debug(f"Lis of who is home is {who_is_home}.")
         return who_is_home
