@@ -6,6 +6,8 @@ from collections.abc import Callable
 from homeassistant.helpers.entity import Entity
 from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant import config_entries, core
+from homeassistant.core import CoreState, callback
+from homeassistant.const import EVENT_HOMEASSISTANT_START
 from homeassistant.helpers.typing import (
     ConfigType,
     DiscoveryInfoType,
@@ -102,8 +104,16 @@ class HomeOccupancyBinarySensor(Entity):
             timedelta(minutes=10)
         )
 
-        await asyncio.sleep(15)  # Delete once you have a better solution.
-        await self.async_update()
+        # await asyncio.sleep(15)  # Delete once you have a better solution.
+        # await self.async_update()
+        if self.hass.state == CoreState.running:
+            await self.async_update()
+        else:
+            @callback
+            def _async_set_initial_state(_):
+                self.hass.async_create_task(self.async_update())
+
+            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, _async_set_initial_state)
 
     @property
     def name(self) -> str:
