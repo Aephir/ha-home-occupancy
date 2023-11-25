@@ -9,11 +9,11 @@ CONF_ADD_ANOTHER = "add_another"
 ATTR_FRIENDLY_NAME = "friendly_name"
 ATTR_GUESTS = "guests"
 ATTR_KNOWN_PEOPLE = "known_people"
-ATTR_LAST_TO_ARRIVE_HOME = "last_to_arrive_home"
+ATTR_LAST_TO_ARRIVE = "last_to_arrive"
 ATTR_LAST_TO_LEAVE = "last_to_leave"
 ATTR_WHO_IS_HOME = "who_is_home"
 
-VERSION = "0.1.1-beta"
+VERSION = "0.2.0"
 
 STARTUP = """
   ___

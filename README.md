@@ -1,8 +1,19 @@
 # Home Occupancy for Home Assistant
 
-__OBS!__ This should be considered very early beta. I will not have much time to work on this, so this state might persist for quite some time.
-You are of course welcome to fork (or ask to be added as maintainer) if you feel like you can contribute.
-Otherwise, please use only if you don't need this for anything crucial. 
+Keeps track of home occupancy using the following:
+- Any number of `device_tracker` or `person` entity IDs.
+- Any number in `input_boolean`, e.g., an `input.boolean.guest_mode`.
+
+Provides the following:
+
+| Name           | Possible states | Explanation                                                                                 |
+|----------------|-----------------|---------------------------------------------------------------------------------------------|
+| State          | on, off         | whether anyone is home                                                                      |
+| Last to arrive | $NAME           | $NAME of last person to arrive                                                              |
+| Last to leave  | $NAME           | $NAME of last person to leave                                                               |
+| Known people   | integer         | Number of known people home. "Known people" are from `person` or `deveice_tracker` entities |
+| Who is home    | $NAME_LIST      | List of $NAME of everyone home. Taken from `person` or `deveice_tracker` name               |
+| Guests         | bool            | Whether an entity ID with the string "guest" in it is home/on                               |
 
 ## Installation
 
@@ -13,7 +24,7 @@ Otherwise, please use only if you don't need this for anything crucial.
 - Select `Custom repositories`
 - Add this repository url (`https://github.com/Aephir/ha-home-occupancy`)
 - Select +,
-- Search for ``home occupancy and install it,
+- Search for "home occupancy" and install it,
 - Restart Home Assistant
 
 ### Option 2: Manual
