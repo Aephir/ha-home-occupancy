@@ -267,7 +267,7 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
         # Construct the dictionary of attributes
         attributes = {
             ATTR_KNOWN_PEOPLE: str(len(who_is_home)),
-            ATTR_WHO_IS_HOME: self.comma_separated_list_to_string(who_is_home),
+            ATTR_WHO_IS_HOME: who_is_home,
             # Include other attributes like last_to_leave and last_to_arrive if needed
         }
 
@@ -280,22 +280,3 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
             is_home = entity.state in self.home_states
             return is_home
         return False
-
-    @staticmethod
-    def comma_separated_list_to_string(input_list: list[str]) -> str:
-        """Creates a string of a list in human-readable format"""
-
-        who_is_home: str = ""
-        length = len(input_list)
-
-        if length == 1:
-            who_is_home = input_list[0]
-        elif length == 2:
-            who_is_home = input_list[0] + " and " + input_list[1]
-        else:
-            for i in range(length):
-                if (i - 2) < length:
-                    who_is_home += input_list[i] + ", "
-                else:
-                    who_is_home += input_list[i] + ", and " + input_list[i + 1]
-        return who_is_home
