@@ -9,6 +9,8 @@ from homeassistant.const import EVENT_HOMEASSISTANT_START
 from .const import DOMAIN, STARTUP, PRESENCE_SENSOR
 import logging
 
+PLATFORMS: list[str] = ["binary_sensor"]
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -29,9 +31,7 @@ async def async_setup_entry(
     hass_data["unsub_options_update_listener"] = unsub_options_update_listener
     hass.data[DOMAIN][entry.entry_id] = hass_data
 
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "binary_sensor")
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
@@ -73,11 +73,7 @@ async def async_unload_entry(
         entry: config_entries.ConfigEntry
 ) -> bool:
     """Unload a config entry."""
-    unload_ok = all(
-        await asyncio.gather(
-            *[hass.config_entries.async_forward_entry_unload(entry, "sensor")]
-        )
-    )
+    unload_ok: bool = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     # Remove options_update_listener.
     hass.data[DOMAIN][entry.entry_id]["unsub_options_update_listener"]()
 

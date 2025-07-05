@@ -10,10 +10,10 @@ from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant import config_entries, core
 from homeassistant.core import CoreState, callback
 from homeassistant.const import EVENT_HOMEASSISTANT_START
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import (
     ConfigType,
-    DiscoveryInfoType,
-    HomeAssistantType,
+    DiscoveryInfoType
 )
 from homeassistant.const import (
     STATE_ON,
@@ -61,7 +61,7 @@ async def async_setup_entry(
 
 
 async def async_setup_platform(
-        hass: HomeAssistantType,
+        hass: HomeAssistant,
         config: ConfigType,
         async_add_entities: Callable,
         discovery_info: DiscoveryInfoType | None = None,
@@ -81,6 +81,7 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
         self._name = OCCUPANCY_SENSOR
         self.entity_id = f"binary_sensor.{DOMAIN}_{self._name}"
         self._attr_unique_id = f"{DOMAIN}_{self._name}_unique_id"
+        self._attr_device_class = BinarySensorDeviceClass.OCCUPANCY
         self._state = None
         self._available = True
         self._attr_unique_id = f"combined_{self._name}"
@@ -174,8 +175,14 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
         return self._available
 
     @property
-    def state(self) -> str | None:
-        return self._state
+    def is_on(self) -> bool | None:
+        if self._state is None:
+            return None
+        return self._state == STATE_ON
+    
+    # @property
+    # def state(self) -> str | None:
+    #     return self._state
 
     # @property
     # def extra_state_attributes(self) -> dict[str, Any]:
