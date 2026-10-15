@@ -13,7 +13,7 @@ ATTR_LAST_TO_ARRIVE = "last_to_arrive"
 ATTR_LAST_TO_LEAVE = "last_to_leave"
 ATTR_WHO_IS_HOME = "who_is_home"
 
-VERSION = "0.2.0"
+VERSION = "0.2.2"
 
 STARTUP = """
   ___

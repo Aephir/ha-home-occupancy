@@ -8,11 +8,11 @@ Provides the following:
 
 | Name           | Possible states | Explanation                                                                                 |
 |----------------|-----------------|---------------------------------------------------------------------------------------------|
-| State          | on, off         | whether anyone is home                                                                      |
+| State          | on, off         | Whether anyone is home                                                                      |
 | Last to arrive | $NAME           | $NAME of last person to arrive                                                              |
 | Last to leave  | $NAME           | $NAME of last person to leave                                                               |
-| Known people   | integer         | Number of known people home. "Known people" are from `person` or `deveice_tracker` entities |
-| Who is home    | $NAME_LIST      | List of $NAME of everyone home. Taken from `person` or `deveice_tracker` name               |
+| Known people   | integer         | Number of known people home. "Known people" are from `person` or `device_tracker` entities |
+| Who is home    | $NAME_LIST      | List of $NAME of everyone home. Taken from `person` or `device_tracker` name               |
 | Guests         | bool            | Whether an entity ID with the string "guest" in it is home/on                               |
 
 ## Installation
