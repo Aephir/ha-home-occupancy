@@ -116,17 +116,23 @@ class HomeOccupancyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
 
+    @staticmethod
     @callback
-    def async_get_options_flow(self):
-        return HomeOccupancyOptionsFlow(self)
+    def async_get_options_flow(config_entry):
+        return HomeOccupancyOptionsFlow()
 
 
 class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
 
-    def __init__(self, config_entry):
-        self.config_entry = config_entry
-        self.data: dict[str, dict[str, str]] = {}
+    def __init__(self):
+        self.data: dict[str, Any] = {}
         self.number_of_sensors = 0
+
+    def _load_existing(self):
+        """Start from the currently configured sensors (options override data)."""
+        merged = {**self.config_entry.data, **self.config_entry.options}
+        self.data = {k: v for k, v in merged.items() if k.startswith("sensor_")}
+        self.number_of_sensors = len(self.data)
 
     async def async_step_init(self, user_input=None):
         if user_input is not None:
@@ -135,6 +141,7 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
                 return await self.async_step_user()
             elif user_input["reconfig_option"] == "add":
                 # Handle adding new entities here
+                self._load_existing()
                 return await self.async_step_add_entities()
 
         return self.async_show_form(
@@ -162,6 +169,7 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
                     PRESENCE_SENSOR: user_input[PRESENCE_SENSOR],
                     CONF_NAME: str(user_input[CONF_NAME])
                 }
+                self.data["number_of_sensors"] = self.number_of_sensors
 
                 # If user ticked the box show this form again to add more sensors.
                 if user_input.get(CONF_ADD_ANOTHER, False):
@@ -178,11 +186,9 @@ class HomeOccupancyOptionsFlow(config_entries.OptionsFlow):
         return await self.shared_step_logic(user_input)
 
     async def async_step_user(self, user_input=None):
-        for i in range(self.number_of_sensors):
-            sensor_number = i + 1
-            self.data.pop(f"sensor_{sensor_number}", None)
-        self.number_of_sensors = 0
-
+        if user_input is None:
+            self.data = {}
+            self.number_of_sensors = 0
         return await self.async_step_add_entities(user_input)
 
 

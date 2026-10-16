@@ -53,6 +53,8 @@ async def async_setup_entry(
     _LOGGER.debug("Setting up entry for Home Occupancy.")
     config = hass.data[DOMAIN][config_entry.entry_id]
     if config_entry.options:
+        for key in [k for k in config if k.startswith("sensor_")]:
+            del config[key]
         config.update(config_entry.options)
 
     # Initialize the binary_sensor with the configuration
