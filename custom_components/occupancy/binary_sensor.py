@@ -92,16 +92,10 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
         self.away_states: list[str] = [STATE_OFF, STATE_NOT_HOME, STATE_AWAY]
         self.home_and_unknown_states: list[str] = self.home_states + [STATE_UNKNOWN]
         self.away_and_unknown_states: list[str] = self.away_states + [STATE_UNKNOWN]
-        self.hass = hass
         self.presence_sensors: list[str] = []
         self.last_to_leave = None
         self.last_to_arrive = None
 
-        @callback
-        def _async_on_ha_start(_):
-            self.hass.async_create_task(self.update_away_states())
-
-        self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, _async_on_ha_start)
 
     async def update_away_states(self):
         """Update away states to include all zone names, excluding home states."""
@@ -117,6 +111,14 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
 
     async def async_added_to_hass(self):
         """Run when entity is added to hass."""
+
+        @callback
+        def _async_on_ha_start(_):
+            self.hass.async_create_task(self.update_away_states())
+
+        self.async_on_remove(
+            self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, _async_on_ha_start)
+        )
 
         # Restore the last state if available
         last_state = await self.async_get_last_state()
@@ -266,12 +268,13 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
 
     def who_is_home(self) -> dict:
         """Determine who is home and return attributes."""
-        who_is_home = [
-            self.config[f"sensor_{i + 1}"]["name"]
-            for i in range(self.config["number_of_sensors"])
-            if self.hass.states.get(self.config[f"sensor_{i + 1}"][PRESENCE_SENSOR]) and
-               self.hass.states.get(self.config[f"sensor_{i + 1}"][PRESENCE_SENSOR]).state.lower() == "home"
-        ]
+        who_is_home = []
+        for key, val in self.config.items():
+            if not key.startswith("sensor_"):
+                continue
+            state = self.hass.states.get(val[PRESENCE_SENSOR])
+            if state and state.state.lower() == "home":
+                who_is_home.append(val[CONF_NAME])
 
         # Construct the dictionary of attributes
         attributes = {
