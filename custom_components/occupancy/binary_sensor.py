@@ -22,10 +22,12 @@ from homeassistant.const import (
     STATE_NOT_HOME,
     STATE_UNKNOWN
 )
+from homeassistant.core import Event
 from homeassistant.helpers.event import (
-    async_track_state_change
+    EventStateChangedData,
+    async_track_state_change_event,
+    async_track_time_interval,
 )
-from homeassistant.helpers.event import async_track_time_interval
 import logging
 from .const import (
     DOMAIN,
@@ -128,26 +130,22 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
 
         self.presence_sensors = [self.config[key][PRESENCE_SENSOR] for key in self.config if key.startswith("sensor_")]
 
-        async_track_state_change(
-            self.hass,
-            self.presence_sensors,
-            self.async_track_home,
-            self.away_and_unknown_states,
-            self.home_states
+        # async_track_state_change was removed in HA 2025.5; the event-based
+        # tracker fires on every change, so filter to arrive/leave transitions here.
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass,
+                self.presence_sensors,
+                self._async_presence_changed,
+            )
         )
 
-        async_track_state_change(
-            self.hass,
-            self.presence_sensors,
-            self.async_track_home,
-            self.home_and_unknown_states,
-            self.away_states
-        )
-
-        async_track_time_interval(
-            self.hass,
-            self.async_update,
-            timedelta(minutes=10)
+        self.async_on_remove(
+            async_track_time_interval(
+                self.hass,
+                self.async_update,
+                timedelta(minutes=10)
+            )
         )
 
         # await asyncio.sleep(15)  # Delete once you have a better solution.
@@ -234,6 +232,19 @@ class HomeOccupancyBinarySensor(BinarySensorEntity, RestoreEntity):
             self._state = new_state
             self.attrs.update(new_attrs)
             self.async_write_ha_state()  # This will schedule an update to HA
+
+    async def _async_presence_changed(self, event: Event[EventStateChangedData]) -> None:
+        """Handle a presence sensor state change; act only on arrive/leave transitions."""
+        entity_id = event.data["entity_id"]
+        old_state = event.data["old_state"]
+        new_state = event.data["new_state"]
+        if new_state is None:
+            return
+        old = old_state.state if old_state is not None else STATE_UNKNOWN
+        arrived = old in self.away_and_unknown_states and new_state.state in self.home_states
+        left = old in self.home_and_unknown_states and new_state.state in self.away_states
+        if arrived or left:
+            await self.async_track_home(entity_id, old_state, new_state)
 
     async def async_track_home(self, entity_id, old_state, new_state) -> None:
         """Track state changes of associated device_tracker, person, and binary_sensor entities"""
